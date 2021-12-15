@@ -25,3 +25,4 @@ runs:
       shell: sh
     - name: Run python script
       run: python ${{ github.action_pat }}/script.py ${{ inputs.script-path }} ${{ inputs.host }} ${{ inputs.max-retries }}
+      shell: sh
