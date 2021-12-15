@@ -10,7 +10,7 @@ from pydeephaven import Session, DHError
 import sys
 import time
 
-def main(script_paths: list[str], host: str, max_retries: int):
+def main(script_paths: list, host: str, max_retries: int):
     """
     Main method for the script. Simply runs the Python scripts in the given paths
     on the Deephaven server.
