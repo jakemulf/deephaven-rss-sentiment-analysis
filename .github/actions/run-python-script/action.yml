@@ -1,0 +1,27 @@
+name: Run Python Script
+description: Runs a Python script in a Deephaven server
+inputs:
+  script-path:
+    description: The path to the Python script to run
+    required: true
+  host:
+    description: The host name or IP address of the Deephaven instance
+    required: true
+  max-retries:
+    description: The maximum attempts to retry connecting to Deephaven
+    required: false
+    default: 5
+runs:
+  using: composite
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Setup environment
+      run: |
+        pip install --upgrade pip
+        pip install -r ${{ github.action_path }}/requirements.txt
+      shell: sh
+    - name: Run python script
+      run: python ${{ github.action_pat }}/script.py ${{ inputs.script-path }} ${{ inputs.host }} ${{ inputs.max-retries }}
