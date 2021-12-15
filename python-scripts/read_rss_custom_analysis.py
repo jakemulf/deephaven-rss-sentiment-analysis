@@ -52,12 +52,12 @@ def build_model_func(classifier):
 classifier = build_model_func(build_model())
 
 feed = feedparser.parse(RSS_FEED_URL)
-rss_feed_table_writer = DynamicTableWriter(COLUMN_NAMES, COLUMN_TYPES)
-rss_feed_table = rss_feed_table_writer.getTable()
+custom_sia_writer = DynamicTableWriter(COLUMN_NAMES, COLUMN_TYPES)
+custom_sia = custom_sia_writer.getTable()
 
 for entry in feed.entries:
     for attribute in RSS_ATTRIBUTES_TO_ANALYZE:
-        rss_feed_table_writer.logRow(
+        custom_sia_writer.logRow(
             entry[attribute],
             classifier(entry[attribute])
         )

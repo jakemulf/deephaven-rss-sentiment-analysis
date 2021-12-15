@@ -22,10 +22,10 @@ jobs:
       - name: Run Python script
         uses: ./.github/actions/run-python-script
         with:
-          script-path: ./python-scripts/read_rss_default_analysis.py
+          script-paths: ./python-scripts/read_rss_default_analysis.py,./python-scripts/read_rss_custom_analysis.py,./python-scripts/queries.py
           host: localhost
       - name: Validate tables
         uses: deephaven/action-assert-dh-tables-present@v1
         with:
-          table-names: built_in_sia
+          table-names: built_in_sia,averages,medians,deviations,positive_percent,custom_sia
           host: localhost

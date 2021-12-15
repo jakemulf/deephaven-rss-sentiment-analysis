@@ -10,13 +10,13 @@ from pydeephaven import Session, DHError
 import sys
 import time
 
-def main(script_path: str, host: str, max_retries: int):
+def main(script_paths: list[str], host: str, max_retries: int):
     """
-    Main method for the script. Simply runs the Python script in the given path
+    Main method for the script. Simply runs the Python scripts in the given paths
     on the Deephaven server.
 
     Parameters:
-        script_path (str): The path to the Python script to run
+        script_path (list[str]): A list of paths to the Python scripts to run
         host (str): The host name of the Deephaven instance
         max_retries (int): The maximum attempts to retry connecting to Deephaven
 
@@ -25,8 +25,6 @@ def main(script_path: str, host: str, max_retries: int):
     """
     print("Attempting to connect to host at")
     print(host)
-    print("Attempting to run script at")
-    print(script_path)
     session = None
 
     #Simple retry loop in case the server tries to launch before Deephaven is ready
@@ -49,19 +47,21 @@ def main(script_path: str, host: str, max_retries: int):
     if session is None:
         sys.exit(f"Failed to connect to Deephaven after {max_retries} attempts")
 
-    with open(script_path) as f:
-        script_string = f.read()
-        try:
-            session.run_script(script_string)
-        except DHError as e:
-            print(e)
-            sys.exit(f"Deephaven error when trying to run the script at {script_path}")
-        except Exception as e:
-            print(e)
-            sys.exit(f"Unexpected error when trying to run the script at {script_path}")
+    for script_path in script_paths:
+        with open(script_path) as f:
+            print(f"Running script at {script_path}")
+            script_string = f.read()
+            try:
+                session.run_script(script_string)
+            except DHError as e:
+                print(e)
+                sys.exit(f"Deephaven error when trying to run the script at {script_path}")
+            except Exception as e:
+                print(e)
+                sys.exit(f"Unexpected error when trying to run the script at {script_path}")
 
 usage = """
-usage: python run_script.py script-path host max-retries
+usage: python run_script.py script-paths host max-retries
 """
 
 if __name__ == '__main__':
@@ -69,10 +69,10 @@ if __name__ == '__main__':
         sys.exit(usage)
 
     try:
-        script_path = sys.argv[1]
+        script_paths = sys.argv[1].split(",")
         host = sys.argv[2]
         max_retries = int(sys.argv[3])
     except:
         sys.exit(usage)
 
-    main(script_path, host, max_retries)
+    main(script_paths, host, max_retries)
