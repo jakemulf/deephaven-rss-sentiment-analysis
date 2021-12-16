@@ -11,19 +11,9 @@ from nltk.corpus import movie_reviews
 
 from deephaven import DynamicTableWriter, Types as dht
 
-RSS_FEED_URL = "https://www.reddit.com/r/reddit.com/new/.rss"
-RSS_ATTRIBUTES_TO_ANALYZE = [
-    "title"
-]
-
-COLUMN_NAMES = [
-    "Sentence",
-    "Sentiment"
-]
-COLUMN_TYPES = [
-    dht.string,
-    dht.string
-]
+import time
+import threading
+from datetime import datetime
 
 def word_feats(words):
     return dict([(word, True) for word in words])
@@ -51,13 +41,47 @@ def build_model_func(classifier):
 
 classifier = build_model_func(build_model())
 
-feed = feedparser.parse(RSS_FEED_URL)
-rss_feed_table_writer = DynamicTableWriter(COLUMN_NAMES, COLUMN_TYPES)
-rss_feed_table = rss_feed_table_writer.getTable()
 
-for entry in feed.entries:
-    for attribute in RSS_ATTRIBUTES_TO_ANALYZE:
-        rss_feed_table_writer.logRow(
-            entry[attribute],
-            classifier(entry[attribute])
-        )
+column_names = [
+    "Sentence",
+    "Sentiment"
+]
+column_types = [
+    dht.string,
+    dht.string
+]
+custom_sia_writer = DynamicTableWriter(column_names, column_types)
+custom_sia = custom_sia_writer.getTable()
+
+def read_rss(rss_feed_url, rss_attributes, sleep_time=5):
+    last_updated = None
+
+    while True:
+        feed = feedparser.parse(rss_feed_url)
+
+        i = 0
+        while i < len(feed.entries):
+            entry = feed.entries[i]
+
+            if not (last_updated is None) and datetime.fromisoformat(entry["updated"]) <= datetime.fromisoformat(last_updated):
+                break
+
+            for attribute in rss_attributes:
+                custom_sia_writer.logRow(
+                    entry[attribute],
+                    classifier(entry[attribute])
+                )
+
+            i += 1
+
+        if i == 0: #Feed hasn't been updated, sleep
+            time.sleep(sleep_time)
+        else: #Otherwise set last updated time to the newest item in the feed
+            last_updated = feed.entries[0]["updated"]
+
+rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
+rss_attributes = [
+    "title"
+]
+thread = threading.Thread(target=read_rss, args=[rss_feed_url, rss_attributes])
+thread.start()
