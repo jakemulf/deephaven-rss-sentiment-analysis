@@ -1,7 +1,7 @@
 """
-read_rss.py
+read_rss_default_analysis.py
 
-A simple RSS reader with pulling logic
+A simple rss reader in Python that does sentiment analysis using the NLKT default sentiment analysis, and stores the results in Deephaven
 """
 from deephaven import DynamicTableWriter, Types as dht
 
