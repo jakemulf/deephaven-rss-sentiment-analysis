@@ -22,7 +22,7 @@ jobs:
       - name: Run Python script
         uses: ./.github/actions/run-python-script
         with:
-          script-paths: ./python-scripts/read_rss_default_analysis.py,./python-scripts/read_rss_custom_analysis.py,./python-scripts/queries.py
+          script-paths: ./python-scripts/read_rss.py,./python-scripts/read_rss_default_analysis.py,./python-scripts/read_rss_custom_analysis.py,./python-scripts/queries.py
           host: localhost
       - name: Validate tables
         uses: deephaven/action-assert-dh-tables-present@v1
