@@ -27,5 +27,5 @@ jobs:
       - name: Validate tables
         uses: deephaven/action-assert-dh-tables-present@v1
         with:
-          table-names: built_in_sia,averages,medians,deviations,positive_percent,custom_sia
+          table-names: built_in_sia,custom_sia
           host: localhost
