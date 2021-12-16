@@ -12,9 +12,10 @@ This app pulls data from an RSS feed, performs sentiment analysis on the data, a
 
 ### Python scripts
 
-* [`read_rss_default_analysis.py`](read_rss_default_analysis.py) - An RSS reader that uses NLKT's default sentiment analysis.
-* [`read_rss_custom_analysis.py`](read_rss_custom_analysis.py) - An RSS reader that uses a user-defined sentiment analysis.
-* [`queries.py`](queries.py) - Queries to run in Deephaven for extra analysis on the data.
+* [`read_rss.py`](python-scripts/read_rss.py) - Defines the base method for the RSS reader.
+* [`read_rss_default_analysis.py`](python-scripts/read_rss_default_analysis.py) - An RSS reader that uses NLKT's default sentiment analysis.
+* [`read_rss_custom_analysis.py`](python-scripts/read_rss_custom_analysis.py) - An RSS reader that uses a user-defined sentiment analysis.
+* [`queries.py`](python-scripts/queries.py) - Queries to run in Deephaven for extra analysis on the data.
 
 ## High level overview
 
