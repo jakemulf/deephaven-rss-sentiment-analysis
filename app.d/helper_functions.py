@@ -1,7 +1,7 @@
 """
 helper_functions.py
 
-A file that defines some shared helper functions and import for the RSS readers.
+A file that defines some shared helper functions and imports for the RSS readers.
 """
 from deephaven import DynamicTableWriter, Types as dht
 from deephaven.DateTimeUtils import convertDateTime
