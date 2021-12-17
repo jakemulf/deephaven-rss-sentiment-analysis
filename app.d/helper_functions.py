@@ -10,6 +10,8 @@ from dateutil import parser
 
 from datetime import datetime
 
+import threading
+
 def datetime_converter_reddit(entry):
     dt = datetime.fromisoformat(entry["updated"])
     dts = dt.strftime("%Y-%m-%dT%H:%M:%S") + " UTC"

@@ -4,7 +4,7 @@ read_rss_default_analysis.py
 An RSS reader in Python that does sentiment analysis using the NLKT default sentiment analysis, and stores the results in Deephaven.
 
 This file is meant to run through Deephaven's Application Mode as part of several Python scripts. Because of this, some
-variables may not be defined in here, but instead in helper_functions.py.
+variables may not be defined in here, but instead in helper_functions.py or read_rss.py.
 """
 import nltk
 nltk.download('vader_lexicon')

@@ -4,7 +4,7 @@ read_rss_custom_analysis.py
 An RSS analyzer that uses a custom Naive Bayes Classifier.
 
 This file is meant to run through Deephaven's Application Mode as part of several Python scripts. Because of this, some
-variables may not be defined in here, but instead in helper_functions.py.
+variables may not be defined in here, but instead in helper_functions.py or read_rss.py.
 """
 import nltk.classify.util
 from nltk.classify import NaiveBayesClassifier
@@ -47,10 +47,10 @@ def build_model_func(classifier):
         return strn, classifier.classify(_word_feats_string(strn))
     return a
 
-rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
 rss_attributes = [
     "title"
 ]
+
 classifier = build_model_func(build_model())
 
 column_names = [
@@ -58,11 +58,14 @@ column_names = [
     "Sentiment",
     "Datetime",
 ]
+
 column_types = [
     dht.string,
     dht.string,
     dht.datetime
 ]
+
+rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
 custom_sia_wsb_table_writer = DynamicTableWriter(column_names, column_types)
 custom_sia_wsb = custom_sia_wsb_table_writer.getTable()
 

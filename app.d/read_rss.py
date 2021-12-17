@@ -6,9 +6,8 @@ Defines the method for reading from an RSS feed and performing sentiment analysi
 import feedparser
 
 import time
-import threading
 
-def read_rss(rss_feed_url, rss_attributes, classifier, sia_table_writer, datetime_converter, sleep_time=5):
+def read_rss(rss_feed_url, rss_attributes, classifier, table_writer, datetime_converter, sleep_time=5):
     """
     This method continually reads from an RSS feed and stores its data, along with
     sentiment analysis on the data, in a Deephaven table.
@@ -18,11 +17,11 @@ def read_rss(rss_feed_url, rss_attributes, classifier, sia_table_writer, datetim
     Parameters:
         rss_feed_url (str): The RSS feed URL as a string.
         rss_attributes (list<str>): A list of attributes from the RSS feed to analyze.
-        classifier (method): A method that takes a string and returns the desired classification for the string. The
-            returned values of this method are converted to a row in the Deephaven table (except for the datetime),
-            so those attributes need to match.
-        sia_table_writer (deephaven.DynamicTableWriter): The dynamic table writer for the table. This writer can expect to
-            write an arbitrary amount of items in a row. However, the last entry in the row must be a Deephaven datetime object.
+        classifier (method): A method that takes a string and returns the desired classification from it. The
+            returned values of this method are converted to a row in the Deephaven table, so those attributes need to match
+            what the row is expecting (except for the last entry in the row, which is a Deephaven datetime object).
+        table_writer (deephaven.DynamicTableWriter): The dynamic table writer for the table. This writer can expect to
+            write an arbitrary amount of items in a row. However, the last entry in the row will end up being a Deephaven datetime object.
         datetime_converter (method): A method that takes an RSS feed entry and converts it to a Deephaven datetime object.
             This should be customized based on the RSS feed.
         sleep_time (int): An integer representing the number of seconds to wait between
@@ -55,7 +54,7 @@ def read_rss(rss_feed_url, rss_attributes, classifier, sia_table_writer, datetim
                 #need to unpack the 2 tuples
                 write_row = (*write_attributes, *datetime_attribute)
 
-                sia_table_writer.logRow(
+                table_writer.logRow(
                     write_row
                 )
 
