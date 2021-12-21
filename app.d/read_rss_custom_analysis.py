@@ -44,7 +44,7 @@ def build_model_func(classifier):
     Generates a method that classifies a string using the given classifier
     """
     def a(strn):
-        return strn, classifier.classify(_word_feats_string(strn))
+        return classifier.classify(_word_feats_string(strn))
     return a
 
 rss_attributes = [
@@ -53,35 +53,15 @@ rss_attributes = [
 
 classifier = build_model_func(build_model())
 
-column_names = [
-    "Sentence",
-    "Sentiment",
-    "Datetime",
-]
-
-column_types = [
-    dht.string,
-    dht.string,
-    dht.datetime
-]
-
 rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
-custom_sia_wsb_table_writer = DynamicTableWriter(column_names, column_types)
-custom_sia_wsb = custom_sia_wsb_table_writer.getTable()
-
-thread_wsb = threading.Thread(target=read_rss, args=[rss_feed_url, rss_attributes, classifier, custom_sia_wsb_table_writer, datetime_converter_reddit])
-thread_wsb.start()
+custom_sia_wsb = read_rss(rss_feed_url, rss_attributes, datetime_converter_reddit)
 
 rss_feed_url = "https://www.reddit.com/r/all/new/.rss"
-custom_sia_all_table_writer = DynamicTableWriter(column_names, column_types)
-custom_sia_all = custom_sia_all_table_writer.getTable()
-
-thread_all = threading.Thread(target=read_rss, args=[rss_feed_url, rss_attributes, classifier, custom_sia_all_table_writer, datetime_converter_reddit, 1])
-thread_all.start()
+custom_sia_all = read_rss(rss_feed_url, rss_attributes, datetime_converter_reddit, sleep_time=1)
 
 rss_feed_url = "https://hnrss.org/newest"
-custom_sia_hackernews_writer = DynamicTableWriter(column_names, column_types)
-custom_sia_hackernews = custom_sia_hackernews_writer.getTable()
+custom_sia_hackernews = read_rss(rss_feed_url, rss_attributes, datetime_converter_hackernews, sleep_time=60)
 
-thread_hackernews = threading.Thread(target=read_rss, args=[rss_feed_url, rss_attributes, classifier, custom_sia_hackernews_writer, datetime_converter_hackernews, 60])
-thread_hackernews.start()
+custom_sia_wsb = custom_sia_wsb.update("Sentiment = classifier(Sentence)")
+custom_sia_all = custom_sia_all.update("Sentiment = classifier(Sentence)")
+custom_sia_hackernews = custom_sia_hackernews.update("Sentiment = classifier(Sentence)")
