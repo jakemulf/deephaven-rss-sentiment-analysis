@@ -33,7 +33,8 @@ def read_rss(rss_feed_url, rss_attributes_method, datetime_converter, sleep_time
 
     Parameters:
         rss_feed_url (str): The RSS feed URL as a string.
-        rss_attributes_method (method): A method that converts an RSS entry to a list of Strings to analyze.
+        rss_attributes_method (method): A method that converts an RSS entry to a list of Strings to analyze. This should be
+            customized based on the RSS feed.
         datetime_converter (method): A method that takes an RSS feed entry and converts it to a Deephaven datetime object.
             This should be customized based on the RSS feed.
         sleep_time (int): An integer representing the number of seconds to wait between
