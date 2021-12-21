@@ -11,7 +11,20 @@ import time
 
 import threading
 
-def read_rss(rss_feed_url, rss_attributes, datetime_converter, sleep_time=5):
+def read_single_rss_entry(rss_feed_url):
+    """
+    This method returns a single entry from the given RSS feed. This is mostly used
+    for debugging and simple testing.
+
+    Parameters:
+        rss_feed_url (str): The RSS feed URL as a string.
+
+    Returns:
+        dict: A single entry from the RSS feed.
+    """
+    return feedparser.parse(rss_feed_url).entries[0]
+
+def read_rss(rss_feed_url, rss_attributes_method, datetime_converter, sleep_time=5):
     """
     This method continually reads from an RSS feed and stores its data, along with
     sentiment analysis on the data, in a Deephaven table.
@@ -20,7 +33,7 @@ def read_rss(rss_feed_url, rss_attributes, datetime_converter, sleep_time=5):
 
     Parameters:
         rss_feed_url (str): The RSS feed URL as a string.
-        rss_attributes (list<str>): A list of attributes from the RSS feed to analyze.
+        rss_attributes_method (method): A method that converts an RSS entry to a list of Strings to analyze.
         datetime_converter (method): A method that takes an RSS feed entry and converts it to a Deephaven datetime object.
             This should be customized based on the RSS feed.
         sleep_time (int): An integer representing the number of seconds to wait between
@@ -29,7 +42,7 @@ def read_rss(rss_feed_url, rss_attributes, datetime_converter, sleep_time=5):
     Returns:
         Table: The Deephaven table that will contain the results from the RSS feed.
     """
-    def thread_function(rss_feed_url, rss_attributes, datetime_converter, sleep_time, table_writer):
+    def thread_function(rss_feed_url, rss_attributes_method, datetime_converter, sleep_time, table_writer):
         last_updated = None
 
         while True:
@@ -47,9 +60,9 @@ def read_rss(rss_feed_url, rss_attributes, datetime_converter, sleep_time=5):
                     break
 
                 datetime_attribute = datetime_converter(entry)
-                for attribute in rss_attributes:
+                for attribute in rss_attributes_method(entry):
                     table_writer.logRow(
-                        entry[attribute],
+                        attribute,
                         datetime_attribute
                     )
 
@@ -70,7 +83,7 @@ def read_rss(rss_feed_url, rss_attributes, datetime_converter, sleep_time=5):
     ]
     table_writer = DynamicTableWriter(column_names, column_types)
 
-    thread = threading.Thread(target=thread_function, args=[rss_feed_url, rss_attributes, datetime_converter, sleep_time, table_writer])
+    thread = threading.Thread(target=thread_function, args=[rss_feed_url, rss_attributes_method, datetime_converter, sleep_time, table_writer])
     thread.start()
 
     return table_writer.getTable()

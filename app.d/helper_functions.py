@@ -18,3 +18,9 @@ def datetime_converter_hackernews(entry):
     dt = parser.parse(entry["published"])
     dts = dt.strftime("%Y-%m-%dT%H:%M:%S") + " UTC"
     return convertDateTime(dts)
+
+def rss_attributes_method_reddit(entry):
+    return [entry["title"], entry["content"][0]["value"]]
+
+def rss_attributes_method_hackernews(entry):
+    return [entry["title"]]

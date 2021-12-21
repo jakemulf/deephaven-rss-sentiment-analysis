@@ -47,20 +47,16 @@ def build_model_func(classifier):
         return classifier.classify(_word_feats_string(strn))
     return a
 
-rss_attributes = [
-    "title"
-]
-
 classifier = build_model_func(build_model())
 
 rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
-custom_sia_wsb = read_rss(rss_feed_url, rss_attributes, datetime_converter_reddit)
+custom_sia_wsb = read_rss(rss_feed_url, rss_attributes_method_reddit, datetime_converter_reddit)
 
 rss_feed_url = "https://www.reddit.com/r/all/new/.rss"
-custom_sia_all = read_rss(rss_feed_url, rss_attributes, datetime_converter_reddit, sleep_time=1)
+custom_sia_all = read_rss(rss_feed_url, rss_attributes_method_reddit, datetime_converter_reddit, sleep_time=1)
 
 rss_feed_url = "https://hnrss.org/newest"
-custom_sia_hackernews = read_rss(rss_feed_url, rss_attributes, datetime_converter_hackernews, sleep_time=60)
+custom_sia_hackernews = read_rss(rss_feed_url, rss_attributes_method_hackernews, datetime_converter_hackernews, sleep_time=60)
 
 custom_sia_wsb = custom_sia_wsb.update("Sentiment = classifier(Sentence)")
 custom_sia_all = custom_sia_all.update("Sentiment = classifier(Sentence)")
