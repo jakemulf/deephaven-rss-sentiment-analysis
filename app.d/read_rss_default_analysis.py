@@ -13,47 +13,40 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 def build_default_sia_classifier_func(classifier):
     def a(strn):
         sentiment = classifier.polarity_scores(strn)
-        return sentiment["pos"], sentiment["neu"], sentiment["neg"], sentiment["compound"], strn
+        return [sentiment["pos"], sentiment["neu"], sentiment["neg"], sentiment["compound"]]
     return a
 
-rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
-rss_attributes = [
-    "title"
-]
 classifier = build_default_sia_classifier_func(SentimentIntensityAnalyzer())
 
-column_names = [
-    "Positive",
-    "Neutral",
-    "Negative",
-    "Compound",
-    "Sentence",
-    "Datetime"
-]
-column_types = [
-    dht.double,
-    dht.double,
-    dht.double,
-    dht.double,
-    dht.string,
-    dht.datetime
-]
-built_in_sia_wsb_writer = DynamicTableWriter(column_names, column_types)
-built_in_sia_wsb = built_in_sia_wsb_writer.getTable()
-
-thread_wsb = threading.Thread(target=read_rss, args=[rss_feed_url, rss_attributes, classifier, built_in_sia_wsb_writer, datetime_converter_reddit])
-thread_wsb.start()
+rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
+built_in_sia_wsb = read_rss(rss_feed_url, rss_attributes_method_reddit, datetime_converter_reddit)
 
 rss_feed_url = "https://www.reddit.com/r/all/new/.rss"
-built_in_sia_all_writer = DynamicTableWriter(column_names, column_types)
-built_in_sia_all = built_in_sia_all_writer.getTable()
-
-thread_all = threading.Thread(target=read_rss, args=[rss_feed_url, rss_attributes, classifier, built_in_sia_all_writer, datetime_converter_reddit, 1])
-thread_all.start()
+built_in_sia_all = read_rss(rss_feed_url, rss_attributes_method_reddit, datetime_converter_reddit, sleep_time=1)
 
 rss_feed_url = "https://hnrss.org/newest"
-built_in_sia_hackernews_writer = DynamicTableWriter(column_names, column_types)
-built_in_sia_hackernews = built_in_sia_hackernews_writer.getTable()
+built_in_sia_hackernews = read_rss(rss_feed_url, rss_attributes_method_hackernews, datetime_converter_hackernews, sleep_time=60)
 
-thread_hackernews = threading.Thread(target=read_rss, args=[rss_feed_url, rss_attributes, classifier, built_in_sia_hackernews_writer, datetime_converter_hackernews, 60])
-thread_hackernews.start()
+rss_feed_url = "https://seekingalpha.com/feed.xml"
+built_in_sia_seeking_alpha = read_rss(rss_feed_url, rss_attributes_seeking_alpha, datetime_converter_seeking_alpha, sleep_time=120)
+
+built_in_sia_wsb = built_in_sia_wsb.update("Sentiment = (org.jpy.PyListWrapper)classifier(Sentence)")\
+    .update("Positive = (double)Sentiment[0]")\
+    .update("Neutral = (double)Sentiment[1]")\
+    .update("Negative = (double)Sentiment[2]")\
+    .update("Compound = (double)Sentiment[3]")
+built_in_sia_all = built_in_sia_all.update("Sentiment = (org.jpy.PyListWrapper)classifier(Sentence)")\
+    .update("Positive = (double)Sentiment[0]")\
+    .update("Neutral = (double)Sentiment[1]")\
+    .update("Negative = (double)Sentiment[2]")\
+    .update("Compound = (double)Sentiment[3]")
+built_in_sia_hackernews = built_in_sia_hackernews.update("Sentiment = (org.jpy.PyListWrapper)classifier(Sentence)")\
+    .update("Positive = (double)Sentiment[0]")\
+    .update("Neutral = (double)Sentiment[1]")\
+    .update("Negative = (double)Sentiment[2]")\
+    .update("Compound = (double)Sentiment[3]")
+built_in_sia_seeking_alpha = built_in_sia_seeking_alpha.update("Sentiment = (org.jpy.PyListWrapper)classifier(Sentence)")\
+    .update("Positive = (double)Sentiment[0]")\
+    .update("Neutral = (double)Sentiment[1]")\
+    .update("Negative = (double)Sentiment[2]")\
+    .update("Compound = (double)Sentiment[3]")

@@ -16,4 +16,4 @@ custom_sia_hackernews_positive_percent = custom_sia_hackernews.update("PositiveC
     .update("PositivePercent = PositiveCount / TotalCount")
 
 # Join 2 tables on the unique datetime and sentence combination
-hackernews_joined = built_in_sia_hackernews.join(custom_sia_hackernews, "Datetime, Sentence")
+hackernews_joined = built_in_sia_hackernews.join(custom_sia_hackernews, "Datetime, Sentence", "TextSentiment = Sentiment")
