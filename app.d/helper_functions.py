@@ -19,8 +19,16 @@ def datetime_converter_hackernews(entry):
     dts = dt.strftime("%Y-%m-%dT%H:%M:%S") + " UTC"
     return convertDateTime(dts)
 
+def datetime_converter_seeking_alpha(entry):
+    dt = parser.parse(entry["published"])
+    dts = dt.strftime("%Y-%m-%dT%H:%M:%S") + " NY"
+    return convertDateTime(dts)
+
 def rss_attributes_method_reddit(entry):
     return [entry["title"], entry["content"][0]["value"]]
 
 def rss_attributes_method_hackernews(entry):
+    return [entry["title"]]
+
+def rss_attributes_seeking_alpha(entry):
     return [entry["title"]]

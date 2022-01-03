@@ -58,6 +58,10 @@ custom_sia_all = read_rss(rss_feed_url, rss_attributes_method_reddit, datetime_c
 rss_feed_url = "https://hnrss.org/newest"
 custom_sia_hackernews = read_rss(rss_feed_url, rss_attributes_method_hackernews, datetime_converter_hackernews, sleep_time=60)
 
+rss_feed_url = "https://seekingalpha.com/feed.xml"
+custom_sia_seeking_alpha = read_rss(rss_feed_url, rss_attributes_seeking_alpha, datetime_converter_seeking_alpha, sleep_time=120)
+
 custom_sia_wsb = custom_sia_wsb.update("Sentiment = classifier(Sentence)")
 custom_sia_all = custom_sia_all.update("Sentiment = classifier(Sentence)")
 custom_sia_hackernews = custom_sia_hackernews.update("Sentiment = classifier(Sentence)")
+custom_sia_seeking_alpha = custom_sia_seeking_alpha.update("Sentiment = classifier(Sentence)")

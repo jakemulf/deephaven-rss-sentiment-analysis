@@ -27,6 +27,9 @@ built_in_sia_all = read_rss(rss_feed_url, rss_attributes_method_reddit, datetime
 rss_feed_url = "https://hnrss.org/newest"
 built_in_sia_hackernews = read_rss(rss_feed_url, rss_attributes_method_hackernews, datetime_converter_hackernews, sleep_time=60)
 
+rss_feed_url = "https://seekingalpha.com/feed.xml"
+built_in_sia_seeking_alpha = read_rss(rss_feed_url, rss_attributes_seeking_alpha, datetime_converter_seeking_alpha, sleep_time=120)
+
 built_in_sia_wsb = built_in_sia_wsb.update("Sentiment = (org.jpy.PyListWrapper)classifier(Sentence)")\
     .update("Positive = (double)Sentiment[0]")\
     .update("Neutral = (double)Sentiment[1]")\
@@ -38,6 +41,11 @@ built_in_sia_all = built_in_sia_all.update("Sentiment = (org.jpy.PyListWrapper)c
     .update("Negative = (double)Sentiment[2]")\
     .update("Compound = (double)Sentiment[3]")
 built_in_sia_hackernews = built_in_sia_hackernews.update("Sentiment = (org.jpy.PyListWrapper)classifier(Sentence)")\
+    .update("Positive = (double)Sentiment[0]")\
+    .update("Neutral = (double)Sentiment[1]")\
+    .update("Negative = (double)Sentiment[2]")\
+    .update("Compound = (double)Sentiment[3]")
+built_in_sia_seeking_alpha = built_in_sia_seeking_alpha.update("Sentiment = (org.jpy.PyListWrapper)classifier(Sentence)")\
     .update("Positive = (double)Sentiment[0]")\
     .update("Neutral = (double)Sentiment[1]")\
     .update("Negative = (double)Sentiment[2]")\
