@@ -10,7 +10,7 @@ import json
 
 def rss_attributes_method_podcasts(entry):
     return (entry["title"], rss_datetime_converter_podcasts(entry), entry["title_detail"]["base"],
-			json.dumps(entry))
+            json.dumps(entry))
 
 def rss_datetime_converter_podcasts(entry):
     try:
@@ -110,18 +110,18 @@ podcast_feed_urls = [
 ]
 
 column_names = [
-	"RssEntryTitle",
-	"PublishDatetime",
-	"RssFeedUrl",
-	"JsonObject",
+    "RssEntryTitle",
+    "PublishDatetime",
+    "RssFeedUrl",
+    "JsonObject",
 ]
 column_types = [
-	dht.string,
-	dht.datetime,
-	dht.string,
-	dht.string,
+    dht.string,
+    dht.datetime,
+    dht.string,
+    dht.string,
 ]
 
 podcast_feeds = read_rss_continual(podcast_feed_urls, sleep_time=300, rss_attributes_method=rss_attributes_method_podcasts,
-								   rss_datetime_converter=rss_datetime_converter_podcasts, column_names=column_names,
-								   column_types=column_types)
+                                   rss_datetime_converter=rss_datetime_converter_podcasts, column_names=column_names,
+                                   column_types=column_types)
