@@ -18,17 +18,17 @@ def build_default_sia_classifier_func(classifier):
 
 classifier = build_default_sia_classifier_func(SentimentIntensityAnalyzer())
 
-rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
-built_in_sia_wsb = read_rss_continual(rss_feed_url, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit)
+rss_feed_urls = ["https://www.reddit.com/r/wallstreetbets/new/.rss"]
+built_in_sia_wsb = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit)
 
-rss_feed_url = "https://www.reddit.com/r/all/new/.rss"
-built_in_sia_all = read_rss_continual(rss_feed_url, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit, sleep_time=1)
+rss_feed_urls = ["https://www.reddit.com/r/all/new/.rss"]
+built_in_sia_all = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit, sleep_time=1)
 
-rss_feed_url = "https://hnrss.org/newest"
-built_in_sia_hackernews = read_rss_continual(rss_feed_url, rss_attributes_method=rss_attributes_method_hackernews, rss_datetime_converter=datetime_converter_hackernews, sleep_time=60)
+rss_feed_urls = ["https://hnrss.org/newest"]
+built_in_sia_hackernews = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_hackernews, rss_datetime_converter=datetime_converter_hackernews, sleep_time=60)
 
-rss_feed_url = "https://seekingalpha.com/feed.xml"
-built_in_sia_seeking_alpha = read_rss_continual(rss_feed_url, rss_attributes_method=rss_attributes_seeking_alpha, rss_datetime_converter=datetime_converter_seeking_alpha, sleep_time=120)
+rss_feed_urls = ["https://seekingalpha.com/feed.xml"]
+built_in_sia_seeking_alpha = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_seeking_alpha, rss_datetime_converter=datetime_converter_seeking_alpha, sleep_time=120)
 
 built_in_sia_wsb = built_in_sia_wsb.update("Sentiment = (org.jpy.PyListWrapper)classifier(Sentence)")\
     .update("Positive = (double)Sentiment[0]")\
