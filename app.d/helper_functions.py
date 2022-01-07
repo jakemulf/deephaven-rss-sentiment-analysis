@@ -25,10 +25,10 @@ def datetime_converter_seeking_alpha(entry):
     return convertDateTime(dts)
 
 def rss_attributes_method_reddit(entry):
-    return (entry["title"], datetime_converter_reddit(entry), "NA")
+    return (entry["title"], datetime_converter_reddit(entry), entry["title_detail"]["base"])
 
 def rss_attributes_method_hackernews(entry):
-    return (entry["title"], datetime_converter_hackernews(entry), "NA")
+    return (entry["title"], datetime_converter_hackernews(entry), entry["title_detail"]["base"])
 
 def rss_attributes_seeking_alpha(entry):
-    return (entry["title"], datetime_converter_seeking_alpha(entry), "NA")
+    return (entry["title"], datetime_converter_seeking_alpha(entry), entry["title_detail"]["base"])
