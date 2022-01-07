@@ -50,22 +50,22 @@ def build_model_func(classifier):
 classifier = build_model_func(build_model())
 
 #Continual readers
-rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
-custom_sia_wsb = read_rss_continual(rss_feed_url, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit)
+rss_feed_urls = ["https://www.reddit.com/r/wallstreetbets/new/.rss"]
+custom_sia_wsb = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit)
 
-rss_feed_url = "https://www.reddit.com/r/all/new/.rss"
-custom_sia_all = read_rss_continual(rss_feed_url, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit, sleep_time=1)
+rss_feed_urls = ["https://www.reddit.com/r/all/new/.rss"]
+custom_sia_all = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit, sleep_time=1)
 
-rss_feed_url = "https://hnrss.org/newest"
-custom_sia_hackernews = read_rss_continual(rss_feed_url, rss_attributes_method=rss_attributes_method_hackernews, rss_datetime_converter=datetime_converter_hackernews, sleep_time=60)
+rss_feed_urls = ["https://hnrss.org/newest"]
+custom_sia_hackernews = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_hackernews, rss_datetime_converter=datetime_converter_hackernews, sleep_time=60)
 
-rss_feed_url = "https://seekingalpha.com/feed.xml"
-custom_sia_seeking_alpha = read_rss_continual(rss_feed_url, rss_attributes_method=rss_attributes_seeking_alpha, rss_datetime_converter=datetime_converter_seeking_alpha, sleep_time=120)
+rss_feed_urls = ["https://seekingalpha.com/feed.xml"]
+custom_sia_seeking_alpha = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_seeking_alpha, rss_datetime_converter=datetime_converter_seeking_alpha, sleep_time=120)
 
-custom_sia_wsb = custom_sia_wsb.update("Sentiment = classifier(Sentence)")
-custom_sia_all = custom_sia_all.update("Sentiment = classifier(Sentence)")
-custom_sia_hackernews = custom_sia_hackernews.update("Sentiment = classifier(Sentence)")
-custom_sia_seeking_alpha = custom_sia_seeking_alpha.update("Sentiment = classifier(Sentence)")
+custom_sia_wsb = custom_sia_wsb.update("Sentiment = classifier(RssEntryTitle)")
+custom_sia_all = custom_sia_all.update("Sentiment = classifier(RssEntryTitle)")
+custom_sia_hackernews = custom_sia_hackernews.update("Sentiment = classifier(RssEntryTitle)")
+custom_sia_seeking_alpha = custom_sia_seeking_alpha.update("Sentiment = classifier(RssEntryTitle)")
 
 #Static readers
 rss_feed_url = "https://www.reddit.com/r/wallstreetbets/new/.rss"
