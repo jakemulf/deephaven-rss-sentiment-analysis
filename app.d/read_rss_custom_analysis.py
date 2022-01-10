@@ -50,8 +50,10 @@ def build_model_func(classifier):
 classifier = build_model_func(build_model())
 
 #Continual readers
+def print_alert():
+    print("New rows read on WSB!")
 rss_feed_urls = ["https://www.reddit.com/r/wallstreetbets/new/.rss"]
-custom_sia_wsb = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit)
+custom_sia_wsb = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit, alert_for_new_rows=print_alert)
 
 rss_feed_urls = ["https://www.reddit.com/r/all/new/.rss"]
 custom_sia_all = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit, sleep_time=1)
