@@ -24,6 +24,8 @@ built_in_sia_wsb = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_a
 rss_feed_urls = ["https://www.reddit.com/r/all/new/.rss"]
 built_in_sia_all = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit, sleep_time=1)
 
+reddit_all_wsb = read_rss_continual(["https://www.reddit.com/r/all/new/.rss", "https://www.reddit.com/r/wallstreetbets/new/.rss"], rss_attributes_method=rss_attributes_method_reddit, rss_datetime_converter=datetime_converter_reddit, sleep_time=1)
+
 rss_feed_urls = ["https://hnrss.org/newest"]
 built_in_sia_hackernews = read_rss_continual(rss_feed_urls, rss_attributes_method=rss_attributes_method_hackernews, rss_datetime_converter=datetime_converter_hackernews, sleep_time=60)
 

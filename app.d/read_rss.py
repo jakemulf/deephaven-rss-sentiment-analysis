@@ -5,11 +5,12 @@ Defines the method for reading from an RSS feed and performing sentiment analysi
 """
 import feedparser
 from deephaven import DynamicTableWriter, Types as dht
+from deephaven.TableTools import merge
 from deephaven.DateTimeUtils import convertDateTime, currentTime
 from dateutil import parser
 
 import time
-
+import math
 import threading
 
 def _default_rss_attributes_method(entry):
@@ -84,7 +85,7 @@ def read_rss_static(rss_feed_url=None, rss_attributes_method=None, rss_datetime_
     return table_writer.getTable()
 
 def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_converter=None,
-        sleep_time=5, column_names=None, column_types=None):
+        sleep_time=5, column_names=None, column_types=None, thread_count=None):
     """
     This method continually reads from an RSS feed and stores its data in a Deephaven table.
 
@@ -93,6 +94,13 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
     This method works best with RSS feeds that are always ordered by date-time, and update frequently. Some
     examples of this are Reddit and Hackernews RSS feeds. If you're unsure if your RSS feed will work, you can
     play it safe and use the read_rss_static() method and build your own method.
+
+    This method is highly customizeable. rss_attributes_method, column_names, and column_types define the resulting
+    Deephaven table, and rss_datetime_converter allows you to define how the datetime of the entry is computed. sleep_time
+    can be customized for performance (a larger value is useful for feeds that don't update often, while a smaller value
+    is better for feeds that update quickly).
+
+    thread_count can be used to run the RSS reader across multiple threads.
 
     Parameters:
         rss_feed_urls (list<str>): A list of RSS feed URLs to view.
@@ -103,6 +111,7 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
             RSS pulls if data hasn't changed.
         column_names (list<str>): A list of column names for the resulting table.
         column_types (list<dht.type>): A list of column types for the resulting table.
+        thread_count (int): How many threads to run the RSS reader in. If not set, 1 thread will be used.
 
     Returns:
         Table: The Deephaven table that will contain the results from the RSS feed.
@@ -120,24 +129,29 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
 
                 i = 0
                 while i < len(feed.entries):
-                    entry = feed.entries[i]
-                    datetime_attribute = rss_datetime_converter(entry)
+                    try:
+                        entry = feed.entries[i]
+                        datetime_attribute = rss_datetime_converter(entry)
 
-                    #If no datetime, break
-                    if datetime_attribute is None:
-                        break
+                        #If no datetime, break
+                        if datetime_attribute is None:
+                            break
 
-                    #If data has previously been read, and the current item has a timestamp less than or equal
-                    #to the last item written to the table in the previous pull, then stop writing data.
-                    #RSS feeds can unpublish data, so a strict equality comparison can't work.
-                    #This may result in lost data if the RSS feed can publish multiple items with the same timestamp.
-                    if not (last_updated is None) and datetime_attribute <= last_updated:
-                        break
+                        #If data has previously been read, and the current item has a timestamp less than or equal
+                        #to the last item written to the table in the previous pull, then stop writing data.
+                        #RSS feeds can unpublish data, so a strict equality comparison can't work.
+                        #This may result in lost data if the RSS feed can publish multiple items with the same timestamp.
+                        if not (last_updated is None) and datetime_attribute <= last_updated:
+                            break
 
-                    write_row = rss_attributes_method(entry)
-                    table_writer.logRow(
-                        write_row
-                    )
+                        write_row = rss_attributes_method(entry)
+                        table_writer.logRow(
+                            write_row
+                        )
+                    except Exception as e:
+                        #Swallow exceptions for now if things go wrong, the RSS feeds aren't 100% the same format
+                        print(f"Error on reading RSS feed {rss_feed_url}")
+                        print(e)
 
                     i += 1
 
@@ -162,14 +176,27 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
             dht.datetime,
             dht.string
         ]
-    table_writer = DynamicTableWriter(column_names, column_types)
 
     if rss_attributes_method is None:
         rss_attributes_method = _default_rss_attributes_method
     if rss_datetime_converter is None:
         rss_datetime_converter = _default_rss_datetime_converter
 
-    thread = threading.Thread(target=thread_function, args=[rss_feed_urls, rss_attributes_method, rss_datetime_converter, sleep_time, table_writer])
-    thread.start()
-
-    return table_writer.getTable()
+    if thread_count is None:
+        table_writer = DynamicTableWriter(column_names, column_types)
+        thread = threading.Thread(target=thread_function, args=[rss_feed_urls, rss_attributes_method, rss_datetime_converter, sleep_time, table_writer])
+        thread.start()
+        return table_writer.getTable()
+    else:
+        tables = []
+        thread_index = 0
+        urls_per_thread = math.ceil(len(rss_feed_urls)/thread_count)
+        while thread_index < thread_count:
+            table_writer = DynamicTableWriter(column_names, column_types)
+            start_index = thread_index * urls_per_thread
+            #Apparently Python doesn't check index bounds on list splices [:], so this just straight up works
+            thread = threading.Thread(target=thread_function, args=[rss_feed_urls[start_index:start_index + urls_per_thread], rss_attributes_method, rss_datetime_converter, sleep_time, table_writer])
+            thread.start()
+            thread_index += 1
+            tables.append(table_writer.getTable())
+        return merge(tables) 
