@@ -85,7 +85,7 @@ def read_rss_static(rss_feed_url=None, rss_attributes_method=None, rss_datetime_
     return table_writer.getTable()
 
 def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_converter=None,
-        sleep_time=5, column_names=None, column_types=None, alert_for_new_rows=None, thread_count=None):
+        sleep_time=5, column_names=None, column_types=None, thread_count=None):
     """
     This method continually reads from an RSS feed and stores its data in a Deephaven table.
 
@@ -100,8 +100,7 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
     can be customized for performance (a larger value is useful for feeds that don't update often, while a smaller value
     is better for feeds that update quickly).
 
-    If you want to listen for new rows and trigger an alert when a new row is read, you can use the alert_for_new_rows
-    parameter. This method will execute whenever new rows are detected.
+    thread_count can be used to run the RSS reader across multiple threads.
 
     Parameters:
         rss_feed_urls (list<str>): A list of RSS feed URLs to view.
@@ -112,7 +111,6 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
             RSS pulls if data hasn't changed.
         column_names (list<str>): A list of column names for the resulting table.
         column_types (list<dht.type>): A list of column types for the resulting table.
-        alert_for_new_rows (method): A method that will be executed when new rows are read.
         thread_count (int): How many URLs to read per thread. If set to None, all the URLs will be in the same thread.
 
     Returns:
@@ -120,7 +118,6 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
     """
     def thread_function(rss_feed_urls, rss_attributes_method, rss_datetime_converter, sleep_time, table_writer):
         last_updated_list = [None for i in range(len(rss_feed_urls))]
-        first = True
 
         while True:
             rss_feed_url_index = 0
@@ -166,12 +163,6 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
             #Sleep after going through the entire list if no feeds were updated
             if not updated:
                 time.sleep(sleep_time)
-
-            #If feed was updated and it wasn't the first time data was read, call the alert method
-            if updated and not first:
-                if alert_for_new_rows is not None:
-                    alert_for_new_rows()
-            first = False
 
     if column_names is None:
         column_names = [

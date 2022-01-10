@@ -6,3 +6,5 @@ name=RSS reader
 file_0=./helper_functions.py
 file_1=./read_rss.py
 file_2=./read_rss_podcasts.py
+file_3=./read_rss_default_analysis.py
+file_4=./read_rss_custom_analysis.py
