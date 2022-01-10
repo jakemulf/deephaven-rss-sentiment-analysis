@@ -5,6 +5,7 @@ Defines the method for reading from an RSS feed and performing sentiment analysi
 """
 import feedparser
 from deephaven import DynamicTableWriter, Types as dht
+from deephaven.TableTools import merge
 from deephaven.DateTimeUtils import convertDateTime, currentTime
 from dateutil import parser
 
@@ -184,7 +185,6 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
             dht.datetime,
             dht.string
         ]
-    table_writer = DynamicTableWriter(column_names, column_types)
 
     if rss_attributes_method is None:
         rss_attributes_method = _default_rss_attributes_method
@@ -192,16 +192,20 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
         rss_datetime_converter = _default_rss_datetime_converter
 
     if thread_count is None:
+        table_writer = DynamicTableWriter(column_names, column_types)
         thread = threading.Thread(target=thread_function, args=[rss_feed_urls, rss_attributes_method, rss_datetime_converter, sleep_time, table_writer])
         thread.start()
+        return table_writer.getTable()
     else:
+        tables = []
         thread_index = 0
         urls_per_thread = math.ceil(len(rss_feed_urls)/thread_count)
         while thread_index < thread_count:
+            table_writer = DynamicTableWriter(column_names, column_types)
             start_index = thread_index * urls_per_thread
             #Apparently Python doesn't check index bounds on list splices [:], so this just straight up works
             thread = threading.Thread(target=thread_function, args=[rss_feed_urls[start_index:start_index + urls_per_thread], rss_attributes_method, rss_datetime_converter, sleep_time, table_writer])
             thread.start()
             thread_index += 1
-
-    return table_writer.getTable()
+            tables.append(table_writer.getTable())
+        return merge(tables) 
