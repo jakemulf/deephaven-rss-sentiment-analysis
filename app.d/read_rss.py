@@ -111,7 +111,7 @@ def read_rss_continual(rss_feed_urls, rss_attributes_method=None, rss_datetime_c
             RSS pulls if data hasn't changed.
         column_names (list<str>): A list of column names for the resulting table.
         column_types (list<dht.type>): A list of column types for the resulting table.
-        thread_count (int): How many URLs to read per thread. If set to None, all the URLs will be in the same thread.
+        thread_count (int): How many threads to run the RSS reader in. If not set, 1 thread will be used.
 
     Returns:
         Table: The Deephaven table that will contain the results from the RSS feed.
